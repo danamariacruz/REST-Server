@@ -1,5 +1,7 @@
 const {response } = require('express');
 
+const Usuario = require('../models/usuario');
+
   const usuariosGet = (req, res = response) => {
       //obteniendo los valores de un query params, como no son obligatorios y express los fomatea no es 
       //necesario poner nada en la ruta
@@ -26,16 +28,20 @@ const {response } = require('express');
     })
   }
 
-  const usuariosPost =  (req, res = response) => {
+  const usuariosPost =  async (req, res = response) => {
 
     const body = req.body;
     /* tambien puedo desealizar el objecto y mostrar solo lo que me interesa y en la respuesta mandar esas variables
     el nombre de la variable destructurada tiene que ser igual que el de la respuesta
     const {nombre, edad} = req.body;*/
+
+    const usuario = new Usuario(body);
+    //para guardar la data la base de datos
+    await usuario.save();
     
     res.json({
         msg: 'Esto es una peticion POST',
-        body
+        usuario
     })
   }
 
