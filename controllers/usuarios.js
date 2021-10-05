@@ -1,4 +1,6 @@
 const {response } = require('express');
+const bcryptjs = require('bcryptjs');
+
 
 const Usuario = require('../models/usuario');
 
@@ -29,13 +31,26 @@ const Usuario = require('../models/usuario');
   }
 
   const usuariosPost =  async (req, res = response) => {
-
-    const body = req.body;
     /* tambien puedo desealizar el objecto y mostrar solo lo que me interesa y en la respuesta mandar esas variables
     el nombre de la variable destructurada tiene que ser igual que el de la respuesta
-    const {nombre, edad} = req.body;*/
+    const {nombre, edad} = req.body;*/    
 
-    const usuario = new Usuario(body);
+    const {nombre, correo, clave, rol } = req.body;
+
+    const usuario = new Usuario({nombre, correo, clave, rol});
+
+    // Encriptando la clave
+    const salt = bcryptjs.genSaltSync(); //para definir el no. de vueltas que se le quiere dar a una clave mientras mas alto mas fuerte en el encriptado
+    usuario.clave = bcryptjs.hashSync(clave,salt);
+
+    //validando si el correo existe
+    const ExisteCorreo = await Usuario.findOne({correo});
+    if (ExisteCorreo) {
+      return res.status(400).json({
+        mensaje: 'El correo ya fue registrado'
+      });
+    }
+
     //para guardar la data la base de datos
     await usuario.save();
     
