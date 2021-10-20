@@ -4,29 +4,40 @@ const bcryptjs = require('bcryptjs');
 
 const Usuario = require('../models/usuario');
 
-  const usuariosGet = (req, res = response) => {
+  const usuariosGet = async(req, res = response) => {
       //obteniendo los valores de un query params, como no son obligatorios y express los fomatea no es 
       //necesario poner nada en la ruta
       //tambien puedo ponerle a las variable valores por defecto si no se lo envian
 
-      const {nombre = 'no disponible', apikey, limit} = req.query;
+      const {limite = 5, desde = 0} = req.query;
+      const estado = {estado:true};
+
+      const [total,usuarios]= await Promise.all([
+          Usuario.countDocuments(estado),
+          Usuario.find(estado).skip(Number(desde)).limit(Number(limite))
+      ]);
 
     res.json({
-        msg: 'Esto es una peticion GET desde el controlador',
-    nombre,
-    limit,
-    apikey
+        total,
+        usuarios
     })
   }
 
-  const usuariosPut = (req, res = response) => {
+  const usuariosPut = async(req, res = response) => {
       //obteniendo el valor del parametro que me pasaron y enviandolo en la respuesta
-
       const {id} = req.params;
+      const {_id,clave,google,correo, ...resto} = req.body;
+
+      if (clave) {
+        const salt = bcryptjs.genSaltSync();
+        resto.clave = bcryptjs.hashSync(clave,salt);
+      }
+
+      const usuario = await Usuario.findByIdAndUpdate(id,resto);
 
     res.json({
-        msg: 'Esto es una peticion PUT',
-        id
+        msg: 'Informacion actualizada',
+        usuario
     })
   }
 
@@ -43,15 +54,7 @@ const Usuario = require('../models/usuario');
     const salt = bcryptjs.genSaltSync(); //para definir el no. de vueltas que se le quiere dar a una clave mientras mas alto mas fuerte en el encriptado
     usuario.clave = bcryptjs.hashSync(clave,salt);
 
-    //validando si el correo existe
-    const ExisteCorreo = await Usuario.findOne({correo});
-    if (ExisteCorreo) {
-      return res.status(400).json({
-        mensaje: 'El correo ya fue registrado'
-      });
-    }
-
-    //para guardar la data la base de datos
+   //para guardar la data la base de datos
     await usuario.save();
     
     res.json({
@@ -60,8 +63,18 @@ const Usuario = require('../models/usuario');
     })
   }
 
-  const usuariosDelete = (req, res = response) => {
+  const usuariosDelete = async (req, res = response) => {
+
+    const {id} = req.params;
+
+    /*eliminando fisicamente el registro de la base de datos
+    const ususrio = await Usuario.findByIdAndDelete(id);*/
+
+    //eliminando pero solo cambiando el estado
+    const ususrio = await Usuario.findByIdAndUpdate(id,{estado : false});
+
     res.json({
+      usuario : ususrio,
         msg: 'Esto es una peticion DELETE'
     })
   }
