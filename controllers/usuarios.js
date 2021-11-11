@@ -4,7 +4,7 @@ const bcryptjs = require('bcryptjs');
 
 const Usuario = require('../models/usuario');
 
-  const usuariosGet = async(req, res = response) => {
+  const usuariosGet = async(req, res = response) => { debugger 
       //obteniendo los valores de un query params, como no son obligatorios y express los fomatea no es 
       //necesario poner nada en la ruta
       //tambien puedo ponerle a las variable valores por defecto si no se lo envian
@@ -12,7 +12,7 @@ const Usuario = require('../models/usuario');
       const {limite = 5, desde = 0} = req.query;
       const estado = {estado:true};
 
-      const [total,usuarios]= await Promise.all([
+      const [total,usuarios]= await Promise.all([  
           Usuario.countDocuments(estado),
           Usuario.find(estado).skip(Number(desde)).limit(Number(limite))
       ]);
@@ -72,9 +72,11 @@ const Usuario = require('../models/usuario');
 
     //eliminando pero solo cambiando el estado
     const ususrio = await Usuario.findByIdAndUpdate(id,{estado : false});
+    const usuarioAutenticado = req.usuario;
 
     res.json({
       usuario : ususrio,
+      usuarioA : usuarioAutenticado,
         msg: 'Esto es una peticion DELETE'
     })
   }
