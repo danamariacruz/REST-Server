@@ -106,8 +106,13 @@ const HistorialGet = async(req, res = response) => {
 
 const HistorialLogs = async(req, res = response) => {  
     const {fecha} = req.query;  
+    let historialLogs;
 
-    const historialLogs = await Logs.find({fecha: fecha});
+    if (fecha == '' || fecha == null) {
+      historialLogs   = await Logs.find();
+    } else {
+       historialLogs = await Logs.find({fecha: fecha});
+    }
 
     if (historialLogs == null) {
         res.json({
