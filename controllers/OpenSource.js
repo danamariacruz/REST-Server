@@ -11,10 +11,9 @@ const Logs = require('../models/Logs');
 
 const TasaGet = async(req, res = response) => {  
     const {CodigoMoneda} = req.params;
-    const {_id, ...resto} = req.body;   
 
-    const {PrecioActual} = await Tasa.findOne({CodigoMoneda : CodigoMoneda});
-
+    const tasaCambio = await Tasa.findOne({CodigoMoneda : CodigoMoneda.toUpperCase()});
+  
     const noServicio = 1;
     var {CantidadLlamada, ...logs} = await Logs.findOne({idServicio : noServicio});
 
@@ -22,9 +21,16 @@ const TasaGet = async(req, res = response) => {
 
     const actualizar = await Logs.updateOne({idServicio : noServicio},{CantidadLlamada: acumulador})
 
-  res.json({
-      PrecioActual,
-  })
+    if (tasaCambio == null) {
+        res.json({
+            Mensaje : 'No se encuentra lo pedido'
+        })
+    } else {
+        res.json({
+            tasaT: tasaCambio.PrecioActual
+        })
+    }
+
   }
 
 const IndiceGet = async(req, res = response) => {  
