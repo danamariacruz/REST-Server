@@ -111,13 +111,19 @@ const HistorialGet = async(req, res = response) => {
   }
 
 const HistorialLogs = async(req, res = response) => {  
-    const {fecha} = req.query;  
+    const {desde='', hasta=''} = req.query;  
     let historialLogs;
 
-    if (fecha == '' || fecha == null) {
+    if (desde == '' && hasta == '') {
       historialLogs   = await Logs.find();
+    } else if (desde != '' && hasta =='' ) {
+       historialLogs = await Logs.find({fecha: {$gte: desde}});
     } else {
-       historialLogs = await Logs.find({fecha: fecha});
+        console.log(hasta );
+        historialLogs = await Logs.find({fecha: {
+            $gte: desde,
+            $lte: hasta
+         }});
     }
 
     if (historialLogs == null) {

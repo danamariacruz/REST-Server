@@ -4,7 +4,7 @@ const bcryptjs = require('bcryptjs');
 
 const Usuario = require('../models/usuario');
 
-  const usuariosGet = async(req, res = response) => { debugger 
+  const usuariosGet = async(req, res = response) => { 
       //obteniendo los valores de un query params, como no son obligatorios y express los fomatea no es 
       //necesario poner nada en la ruta
       //tambien puedo ponerle a las variable valores por defecto si no se lo envian
