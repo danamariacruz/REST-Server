@@ -119,7 +119,7 @@ const HistorialLogs = async(req, res = response) => {
     } else if (desde != '' && hasta =='' ) {
        historialLogs = await Logs.find({fecha: {$gte: desde}});
     } else {
-        console.log(hasta );
+        
         historialLogs = await Logs.find({fecha: {
             $gte: desde,
             $lte: hasta
